@@ -1,0 +1,23 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Redirige les requêtes vers le dossier /public pour éviter d'exposer les fichiers système
+    RewriteCond %{REQUEST_URI}::$0 ^(/.+)/(.*)::\2$
+    RewriteRule .* - [E=BASE:%1]
+
+    # Redirige toutes les requêtes non-fichiers vers index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ %{ENV:BASE}/index.php [L]
+</IfModule>
+
+# Désactive l'affichage des listes de dossiers pour la sécurité
+Options -Indexes
+
+<IfModule mod_headers.c>
+    # Ajoute des headers pour la sécurité et les performances
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+</IfModule>
+ 
